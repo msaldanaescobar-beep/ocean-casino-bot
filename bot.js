@@ -1,7 +1,7 @@
 import { Telegraf, Markup } from "telegraf";
 
-const BOT_TOKEN = "PEGA_AQUI_TU_TOKEN";
-const ADMIN_ID = 123456789;
+const BOT_TOKEN = " OceanCasinoVipBot ";
+const ADMIN_ID = 8543841599 ;
 
 const bot = new Telegraf(BOT_TOKEN);
 

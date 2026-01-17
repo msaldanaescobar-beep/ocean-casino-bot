@@ -2,7 +2,10 @@ import { Telegraf, Markup } from "telegraf";
 
 /* ================= CONFIG ================= */
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const ADMIN_ID = process.env.ADMIN_ID;
+const ADMIN_ID = Number(process.env.ADMIN_ID);
+
+// 🔥 PLACEHOLDER LINK AFILIADO
+const CASINO_LINK = "https://CASINO-AFILIADO.com/?ref=oceanvip";
 /* ========================================= */
 
 if (!BOT_TOKEN) {
@@ -16,107 +19,83 @@ const bot = new Telegraf(BOT_TOKEN);
 bot.start(async (ctx) => {
   const user = ctx.from;
 
-  // Notificar admin
-  if (ADMIN_ID) {
+  // Notificar admin (solo humano)
+  if (ADMIN_ID && user.id !== ADMIN_ID) {
     bot.telegram.sendMessage(
       ADMIN_ID,
-      `🆕 Nuevo lead\n👤 ${user.first_name}\n🆔 ${user.id}`
-    );
+      `🔥 NUEVO LEAD\n👤 @${user.username || user.first_name}\n🆔 ${user.id}`
+    ).catch(() => {});
   }
 
-  return ctx.reply(
-    `🎰 *OCEAN CASINO VIP*\n\n` +
-    `💰 Bono exclusivo\n` +
-    `⚡ Retiros rápidos\n` +
-    `🇨🇱 Prioridad Chile\n\n` +
-    `¿Desde qué país nos escribes?`,
+  await ctx.reply(
+    `⚠️ <b>JACKPOT ACTIVO – CUPOS LIMITADOS</b>\n
+Hoy se están pagando premios reales.
+Si entras tarde, <b>PIERDES EL BONO</b>.\n
+🇨🇱 Prioridad Chile · LATAM habilitado\n
+⏳ Elige AHORA:`,
     {
-      parse_mode: "Markdown",
+      parse_mode: "HTML",
       ...Markup.inlineKeyboard([
-        [Markup.button.callback("🇨🇱 Chile", "country_chile")],
-        [Markup.button.callback("🇲🇽 México", "country_mexico")],
-        [Markup.button.callback("🇵🇪 Perú", "country_peru")],
-        [Markup.button.callback("🇨🇴 Colombia", "country_colombia")],
-        [Markup.button.callback("🌎 Otro", "country_other")]
+        [Markup.button.url("🎰 ENTRAR AL CASINO VIP", CASINO_LINK)],
+        [Markup.button.callback("🎁 QUIERO MI BONO", "bonus")],
+        [Markup.button.callback("💬 HABLAR CON SOPORTE", "support")]
       ])
     }
   );
 });
 
-/* ============ COUNTRY ============ */
-bot.action(/country_(.+)/, async (ctx) => {
-  await ctx.answerCbQuery();
-  const country = ctx.match[1];
-
-  return ctx.reply(
-    `✅ Perfecto.\n\n¿Qué deseas hacer ahora?`,
-    Markup.inlineKeyboard([
-      [Markup.button.callback("🎁 Quiero el bono", "bonus")],
-      [Markup.button.callback("💸 ¿Cómo retiro?", "withdraw")],
-      [Markup.button.callback("👤 Hablar con soporte", "support")]
-    ])
-  );
-});
-
-/* ============ BONUS ============ */
+/* ============ BONO ============ */
 bot.action("bonus", async (ctx) => {
   await ctx.answerCbQuery();
 
-  return ctx.reply(
-    `🎁 *BONO VIP*\n\n¿Con cuánto deseas comenzar?`,
+  await ctx.reply(
+    `🔥 <b>BONO VIP DISPONIBLE</b>\n
+✔ Activación inmediata
+✔ Sin límite de retiro
+✔ Pagos rápidos\n
+💰 ¿Cuánto planeas depositar?`,
     {
-      parse_mode: "Markdown",
+      parse_mode: "HTML",
       ...Markup.inlineKeyboard([
-        [Markup.button.callback("$10 – $20", "deposit_10_20")],
-        [Markup.button.callback("$20 – $50", "deposit_20_50")],
-        [Markup.button.callback("$50 – $100", "deposit_50_100")],
-        [Markup.button.callback("Más de $100", "deposit_100")]
+        [Markup.button.url("💸 $10 – $20", CASINO_LINK)],
+        [Markup.button.url("💸 $20 – $50", CASINO_LINK)],
+        [Markup.button.url("💸 $50 – $100", CASINO_LINK)],
+        [Markup.button.url("💎 $100+", CASINO_LINK)]
       ])
     }
   );
 });
 
-/* ============ DEPOSITS ============ */
-bot.action(/deposit_(.+)/, async (ctx) => {
-  await ctx.answerCbQuery();
-  const user = ctx.from;
-  const amount = ctx.match[1];
-
-  ctx.reply(
-    `🔥 Excelente decisión.\n\nUn asesor VIP te contactará ahora.`
-  );
-
-  if (ADMIN_ID) {
-    bot.telegram.sendMessage(
-      ADMIN_ID,
-      `🔥 LEAD CALIFICADO\n👤 ${user.first_name}\n🆔 ${user.id}\n💰 Depósito: ${amount}`
-    );
-  }
-});
-
-/* ============ SUPPORT ============ */
+/* ============ SOPORTE HUMANO ============ */
 bot.action("support", async (ctx) => {
   await ctx.answerCbQuery();
-  ctx.reply("👤 Te derivamos con un asesor VIP. Espera un momento…");
 
+  await ctx.reply("⏳ Un asesor VIP te escribirá en breve. Mantente atento.");
+
+  const u = ctx.from;
   if (ADMIN_ID) {
     bot.telegram.sendMessage(
       ADMIN_ID,
-      `📞 Soporte solicitado\n👤 ${ctx.from.first_name}\n🆔 ${ctx.from.id}`
-    );
+      `👤 SOPORTE HUMANO\n@${u.username || u.first_name}\nID: ${u.id}`
+    ).catch(() => {});
   }
 });
 
 /* ============ FALLBACK ============ */
-bot.on("text", (ctx) => {
-  ctx.reply("Usa los botones para continuar 🎰");
+bot.on("text", async (ctx) => {
+  await ctx.reply(
+    "⚠️ El bono puede expirar.\n\n👉 Entra ahora:",
+    Markup.inlineKeyboard([
+      [Markup.button.url("🎰 ACCEDER AL CASINO VIP", CASINO_LINK)]
+    ])
+  );
 });
 
 /* ============ LAUNCH ============ */
 bot.launch().then(() => {
-  console.log("✅ Ocean Casino Bot activo");
+  console.log("✅ Ocean Casino Bot ACTIVO");
 });
 
-/* ============ STOP ============ */
+/* ============ GRACEFUL STOP ============ */
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));

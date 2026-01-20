@@ -3,10 +3,10 @@ import { Telegraf, Markup } from "telegraf";
 // ============================
 // CONFIGURACIÓN
 // ============================
-const BOT_TOKEN = "8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA"; // <-- pega aquí el token del bot
-const ADMIN_CHAT_ID = "8360011868"; // <-- tu chat ID personal
-const AFFILIATE_LINK = "https://.t.me/ceanCasinoVip"; // placeholder
-const SUPPORT_USERNAME = "@OceanCasinoVip";
+const BOT_TOKEN = "BOT_TOKEN_AQUI"; // <-- pega aquí el token del bot
+const ADMIN_CHAT_ID = "TU_CHAT_ID_AQUI"; // <-- tu chat ID personal
+const AFFILIATE_LINK = "https://t.me/Oceancasinoslots"; // placeholder
+const SUPPORT_USERNAME = "@Oceancasinoslots";
 
 const bot = new Telegraf(BOT_TOKEN);
 

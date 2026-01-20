@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 
-const BOT_TOKEN = process.env.8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA ; // token real en Railway
-const ADMIN_ID = process.env.8360011868 ;// tu user_id personal
+const BOT_TOKEN = process.env.BOT_TOKEN; // token real en Railway
+const ADMIN_ID = process.env.ADMIN_ID;   // tu user_id personal
 
 const bot = new Telegraf(BOT_TOKEN);
 

@@ -4,8 +4,6 @@ const BOT_TOKEN = "8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA"; // token del
 const ADMIN_CHAT_ID = 8360011868
 const AFFILIATE_LINK = process.env.AFFILIATE_LINK || "https://example.com";
 
-if (!BOT_TOKEN) {
-  throw new Error("❌ BOT_TOKEN no definido");
 }
 
 const bot = new Telegraf(BOT_TOKEN);

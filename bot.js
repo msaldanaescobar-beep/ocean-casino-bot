@@ -3,7 +3,7 @@ import { Telegraf, Markup } from "telegraf";
 // ===============================
 // CONFIGURACIÓN
 // ===============================
-const BOT_TOKEN = 8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA; // token del bot
+const BOT_TOKEN = "8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA"; // token del bot
 const ADMIN_CHAT_ID = 8360011868; // TU chat id personal (numero)
 
 const bot = new Telegraf(BOT_TOKEN);

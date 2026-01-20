@@ -8,7 +8,7 @@ const ADMIN_CHAT_ID = "8360011868"; // <-- tu chat ID personal
 const AFFILIATE_LINK = "https://t.me/OceancasinoVip"; // placeholder
 const SUPPORT_USERNAME = "@OceanCasinoVip";
 
-const bot = new Telegraf(8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA);
+const bot = new Telegraf(BOT_TOKEN);
 
 // ============================
 // MENSAJES BASE

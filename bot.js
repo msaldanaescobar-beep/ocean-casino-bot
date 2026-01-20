@@ -1,116 +1,119 @@
 import { Telegraf, Markup } from "telegraf";
 
-// ============================
+// ===============================
 // CONFIGURACIÓN
-// ============================
-const BOT_TOKEN = "8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA"; // <-- pega aquí el token del bot
-const ADMIN_CHAT_ID = "8360011868"; // <-- tu chat ID personal
-const AFFILIATE_LINK = "https://t.me/OceancasinoVip"; // placeholder
-const SUPPORT_USERNAME = "@OceanCasinoVip";
+// ===============================
+const BOT_TOKEN = "8360011868:TU_TOKEN_REAL_AQUI"; // token del bot
+const ADMIN_CHAT_ID = 8415598577; // TU chat id personal (numero)
 
 const bot = new Telegraf(BOT_TOKEN);
 
-// ============================
-// MENSAJES BASE
-// ============================
-const START_MESSAGE = `
-🔥 *ACCESO VIP CASINOS 2026* 🔥
-
-⚠️ *Cupos limitados – Chile prioritario*
-
-Aquí NO damos información pública.
-Solo *bonos reales* y *casinos que pagan*.
-
-👇 Elige una opción para continuar:
-`;
-
-const BLOCKED_MESSAGE = "⚠️ Usa los botones.\nEl acceso es limitado.";
-
-const URGENCY_MESSAGE = `
-⏰ *ATENCIÓN*
-Los bonos se cierran cuando se completa el cupo diario.
-Si sales, *puedes perder el acceso*.
-`;
-
-const REGISTER_MESSAGE = `
-💰 *BONO ACTIVO PARA TI*
-
-🎰 Casino verificado
-🎁 Bono de bienvenida exclusivo
-⚡ Retiros rápidos
-
-👇 Accede ahora:
-`;
-
-const HUMAN_MESSAGE = `
-👤 *ATENCIÓN HUMANA*
-
-Un operador revisará tu caso.
-⏳ Tiempo estimado: 5–15 minutos
-
-⚠️ No cierres el chat.
-`;
-
-// ============================
-// BOTONES
-// ============================
+// ===============================
+// MENÚ PRINCIPAL
+// ===============================
 const mainMenu = Markup.inlineKeyboard([
-  [Markup.button.callback("🎰 QUIERO EL BONO", "GET_BONUS")],
-  [Markup.button.callback("💬 HABLAR CON SOPORTE", "HUMAN")],
+  [Markup.button.callback("🎰 Bonos Exclusivos", "bonos")],
+  [Markup.button.callback("🔥 Casino Recomendado Hoy", "casino")],
+  [Markup.button.callback("💰 Ganadores en Vivo", "wins")],
+  [Markup.button.callback("📲 Hablar con Soporte VIP", "soporte")]
 ]);
 
-const bonusMenu = Markup.inlineKeyboard([
-  [Markup.button.url("🚀 ACCEDER AL CASINO", AFFILIATE_LINK)],
-  [Markup.button.callback("❓ NO PUDE REGISTRARME", "HUMAN")],
-]);
-
-// ============================
-// START
-// ============================
+// ===============================
+// /START
+// ===============================
 bot.start(async (ctx) => {
   const user = ctx.from;
 
-  // Aviso al admin (lead nuevo)
-  await bot.telegram.sendMessage(
+  // Notificación de lead
+  await ctx.telegram.sendMessage(
     ADMIN_CHAT_ID,
-    `🆕 *Nuevo lead*\n👤 ${user.first_name}\n🆔 ${user.id}`,
-    { parse_mode: "Markdown" }
+    `🆕 NUEVO LEAD\n👤 ${user.username || "sin username"}\n🆔 ${user.id}`
   );
 
-  await ctx.replyWithMarkdown(START_MESSAGE, mainMenu);
+  await ctx.reply(
+    `🔥 *ACCESO VIP ACTIVADO*\n\n` +
+    `🎯 Bonos ocultos\n🎰 Casinos con mayor RTP\n💸 Pagos rápidos LATAM\n\n` +
+    `⚠️ Cupos limitados hoy`,
+    {
+      parse_mode: "Markdown",
+      ...mainMenu
+    }
+  );
 });
 
-// ============================
-// BLOQUEAR TEXTO LIBRE
-// ============================
+// ===============================
+// BOTONES
+// ===============================
+bot.action("bonos", async (ctx) => {
+  await ctx.answerCbQuery();
+  await ctx.reply(
+    `🎁 *BONOS ACTIVOS HOY*\n\n` +
+    `✅ Hasta 200% en tu primer depósito\n` +
+    `✅ Free Spins sin wagering\n\n` +
+    `⚠️ Válido solo hoy`,
+    {
+      parse_mode: "Markdown",
+      ...mainMenu
+    }
+  );
+});
+
+bot.action("casino", async (ctx) => {
+  await ctx.answerCbQuery();
+  await ctx.reply(
+    `🔥 *CASINO RECOMENDADO*\n\n` +
+    `🎰 Slots con alto RTP\n💸 Retiros rápidos\n🔐 Acepta LATAM\n\n` +
+    `👉 *Enlace exclusivo:* \n` +
+    `https://TU_LINK_AFILIADO_AQUI`,
+    {
+      parse_mode: "Markdown",
+      ...mainMenu
+    }
+  );
+});
+
+bot.action("wins", async (ctx) => {
+  await ctx.answerCbQuery();
+  await ctx.reply(
+    `💰 *GANADORES RECIENTES*\n\n` +
+    `🇨🇱 Juan – $450.000 CLP\n` +
+    `🇵🇪 Carlos – $1.200 PEN\n` +
+    `🇦🇷 Sofía – $320.000 ARS\n\n` +
+    `🔥 Pagos reales`,
+    {
+      parse_mode: "Markdown",
+      ...mainMenu
+    }
+  );
+});
+
+bot.action("soporte", async (ctx) => {
+  await ctx.answerCbQuery();
+  await ctx.reply(
+    `📲 *SOPORTE VIP*\n\n` +
+    `Un asesor humano puede ayudarte.\n` +
+    `⚠️ Atención limitada\n\n` +
+    `👉 Escríbenos aquí:\n` +
+    `https://t.me/Oceancasinoslots`,
+    {
+      parse_mode: "Markdown",
+      ...mainMenu
+    }
+  );
+});
+
+// ===============================
+// BLOQUEO DE TEXTO (CONTROLADO)
+// ===============================
 bot.on("text", async (ctx) => {
-  await ctx.reply(BLOCKED_MESSAGE);
-});
-
-// ============================
-// ACCIONES
-// ============================
-bot.action("GET_BONUS", async (ctx) => {
-  await ctx.answerCbQuery();
-  await ctx.replyWithMarkdown(URGENCY_MESSAGE);
-  await ctx.replyWithMarkdown(REGISTER_MESSAGE, bonusMenu);
-});
-
-bot.action("HUMAN", async (ctx) => {
-  await ctx.answerCbQuery();
-
-  // Aviso al admin
-  await bot.telegram.sendMessage(
-    ADMIN_CHAT_ID,
-    `🧑‍💬 *Solicitud de atención humana*\n🆔 ${ctx.from.id}`,
-    { parse_mode: "Markdown" }
+  await ctx.reply(
+    "⚠️ Usa los botones para continuar.\nEl acceso es limitado.",
+    mainMenu
   );
-
-  await ctx.replyWithMarkdown(HUMAN_MESSAGE);
 });
 
-// ============================
-// START BOT
-// ============================
+// ===============================
+// INICIO
+// ===============================
 bot.launch();
-console.log("🤖 OceanCasinoVIP Bot activo");
+console.log("🤖 OceanCasinoVip BOT activo");

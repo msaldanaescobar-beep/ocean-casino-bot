@@ -3,8 +3,7 @@ import { Telegraf, Markup } from "telegraf";
 const BOT_TOKEN = "8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA"; // token del bot
 const ADMIN_CHAT_ID = 8360011868
 const AFFILIATE_LINK = process.env.AFFILIATE_LINK || "https://example.com";
-
-}
+};
 
 const bot = new Telegraf(BOT_TOKEN);
 

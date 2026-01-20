@@ -1,101 +1,114 @@
-import { Telegraf, Markup } from "telegraf";
+import { Telegraf } from "telegraf";
 
-/* ================= CONFIG ================= */
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const ADMIN_ID = Number(process.env.ADMIN_ID);
-
-// 🔥 PLACEHOLDER LINK AFILIADO
-const CASINO_LINK = "https://CASINO-AFILIADO.com/?ref=oceanvip";
-/* ========================================= */
-
-if (!BOT_TOKEN) {
-  console.error("❌ BOT_TOKEN no definido");
-  process.exit(1);
-}
+const BOT_TOKEN = process.env.BOT_TOKEN; 8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA :// token real en Railway
+const ADMIN_ID = process.env.ADMIN_ID;   8360011868 : // tu user_id personal
 
 const bot = new Telegraf(BOT_TOKEN);
 
-/* ============ START ============ */
+// START
 bot.start(async (ctx) => {
   const user = ctx.from;
 
-  // Notificar admin (solo humano)
-  if (ADMIN_ID && user.id !== ADMIN_ID) {
-    bot.telegram.sendMessage(
-      ADMIN_ID,
-      `🔥 NUEVO LEAD\n👤 @${user.username || user.first_name}\n🆔 ${user.id}`
-    ).catch(() => {});
-  }
+  const leadMsg = `
+🆕 NUEVO LEAD
+👤 ${user.username || "Sin username"}
+🌍 ${user.language_code || "N/A"}
+🆔 ${user.id}
+`;
 
-  await ctx.reply(
-    `⚠️ <b>JACKPOT ACTIVO – CUPOS LIMITADOS</b>\n
-Hoy se están pagando premios reales.
-Si entras tarde, <b>PIERDES EL BONO</b>.\n
-🇨🇱 Prioridad Chile · LATAM habilitado\n
-⏳ Elige AHORA:`,
-    {
-      parse_mode: "HTML",
-      ...Markup.inlineKeyboard([
-        [Markup.button.url("🎰 ENTRAR AL CASINO VIP", CASINO_LINK)],
-        [Markup.button.callback("🎁 QUIERO MI BONO", "bonus")],
-        [Markup.button.callback("💬 HABLAR CON SOPORTE", "support")]
-      ])
-    }
-  );
-});
-
-/* ============ BONO ============ */
-bot.action("bonus", async (ctx) => {
-  await ctx.answerCbQuery();
-
-  await ctx.reply(
-    `🔥 <b>BONO VIP DISPONIBLE</b>\n
-✔ Activación inmediata
-✔ Sin límite de retiro
-✔ Pagos rápidos\n
-💰 ¿Cuánto planeas depositar?`,
-    {
-      parse_mode: "HTML",
-      ...Markup.inlineKeyboard([
-        [Markup.button.url("💸 $10 – $20", CASINO_LINK)],
-        [Markup.button.url("💸 $20 – $50", CASINO_LINK)],
-        [Markup.button.url("💸 $50 – $100", CASINO_LINK)],
-        [Markup.button.url("💎 $100+", CASINO_LINK)]
-      ])
-    }
-  );
-});
-
-/* ============ SOPORTE HUMANO ============ */
-bot.action("support", async (ctx) => {
-  await ctx.answerCbQuery();
-
-  await ctx.reply("⏳ Un asesor VIP te escribirá en breve. Mantente atento.");
-
-  const u = ctx.from;
+  // Aviso al admin (SOLO si ADMIN_ID es humano)
   if (ADMIN_ID) {
-    bot.telegram.sendMessage(
-      ADMIN_ID,
-      `👤 SOPORTE HUMANO\n@${u.username || u.first_name}\nID: ${u.id}`
-    ).catch(() => {});
+    await bot.telegram.sendMessage(ADMIN_ID, leadMsg);
+  }
+
+  await ctx.reply(`
+⚠️ ACCESO LIMITADO
+
+No trabajo con curiosos.
+Solo con jugadores reales.
+
+¿De qué país eres?
+`);
+});
+
+// RESPUESTAS
+bot.on("text", async (ctx) => {
+  const text = ctx.message.text.toLowerCase();
+
+  // País detectado
+  if (
+    text.includes("chile") ||
+    text.includes("argentina") ||
+    text.includes("peru") ||
+    text.includes("mexico") ||
+    text.includes("colombia")
+  ) {
+    return ctx.reply(`
+Perfecto.
+
+Tengo cupos activos HOY.
+Después cierro accesos.
+
+¿Has depositado antes en casinos online?
+Responde: SI / NO
+`);
+  }
+
+  // Experiencia previa
+  if (text === "si" || text === "sí") {
+    return ctx.reply(`
+Bien.
+
+Empezamos con monto bajo.
+Si funciona, escalamos.
+
+¿Qué prefieres?
+1️⃣ Slots
+2️⃣ Casino en vivo
+`);
+  }
+
+  if (text === "no") {
+    return ctx.reply(`
+Entonces empezamos tranquilo.
+
+Monto bajo, sin presión.
+Si te gusta, seguimos.
+
+¿Qué prefieres?
+1️⃣ Slots
+2️⃣ Casino en vivo
+`);
+  }
+
+  // Elección final
+  if (text.includes("1")) {
+    return ctx.reply(`
+Perfecto.
+
+Te explico rápido y vamos directo.
+Escríbeme: LISTO
+`);
+  }
+
+  if (text.includes("2")) {
+    return ctx.reply(`
+Bien.
+
+Juego en vivo, retiros rápidos.
+Escríbeme: LISTO
+`);
+  }
+
+  if (text.includes("listo")) {
+    return ctx.reply(`
+Perfecto.
+
+En breve te paso el acceso.
+Mantente atento.
+`);
   }
 });
 
-/* ============ FALLBACK ============ */
-bot.on("text", async (ctx) => {
-  await ctx.reply(
-    "⚠️ El bono puede expirar.\n\n👉 Entra ahora:",
-    Markup.inlineKeyboard([
-      [Markup.button.url("🎰 ACCEDER AL CASINO VIP", CASINO_LINK)]
-    ])
-  );
-});
-
-/* ============ LAUNCH ============ */
-bot.launch().then(() => {
-  console.log("✅ Ocean Casino Bot ACTIVO");
-});
-
-/* ============ GRACEFUL STOP ============ */
-process.once("SIGINT", () => bot.stop("SIGINT"));
-process.once("SIGTERM", () => bot.stop("SIGTERM"));
+bot.launch();
+console.log("🤖 BOT ACTIVO");

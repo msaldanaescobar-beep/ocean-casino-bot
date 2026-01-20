@@ -1,187 +1,116 @@
-// bot.js — Ocean Casino VIP (Producción)
 import { Telegraf, Markup } from "telegraf";
 
-/* ================= CONFIG ================= */
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const ADMIN_ID = Number(process.env.ADMIN_ID);
-const BOT_USERNAME = process.env.BOT_USERNAME || "Oceancasinoslots";
-/* ========================================== */
-
-if (!BOT_TOKEN || !ADMIN_ID) {
-  console.error("❌ Faltan variables de entorno");
-  process.exit(1);
-}
+// ============================
+// CONFIGURACIÓN
+// ============================
+const BOT_TOKEN = "8415598577:AAFgea3lcNN-OrQ1Ro7Jgv6Z4Ihs5IMJKdA"; // <-- pega aquí el token del bot
+const ADMIN_CHAT_ID = "8360011868"; // <-- tu chat ID personal
+const AFFILIATE_LINK = "https://.t.me/ceanCasinoVip"; // placeholder
+const SUPPORT_USERNAME = "@OceanCasinoVip";
 
 const bot = new Telegraf(BOT_TOKEN);
 
-/* ================= HELPERS ================= */
-const notifyAdmin = async (text) => {
-  try {
-    await bot.telegram.sendMessage(ADMIN_ID, text, {
-      parse_mode: "HTML",
-      disable_web_page_preview: true,
-    });
-  } catch (e) {
-    console.log("Admin notify error:", e.message);
-  }
-};
-/* =========================================== */
+// ============================
+// MENSAJES BASE
+// ============================
+const START_MESSAGE = `
+🔥 *ACCESO VIP CASINOS 2026* 🔥
 
-/* ================= START =================== */
+⚠️ *Cupos limitados – Chile prioritario*
+
+Aquí NO damos información pública.
+Solo *bonos reales* y *casinos que pagan*.
+
+👇 Elige una opción para continuar:
+`;
+
+const BLOCKED_MESSAGE = "⚠️ Usa los botones.\nEl acceso es limitado.";
+
+const URGENCY_MESSAGE = `
+⏰ *ATENCIÓN*
+Los bonos se cierran cuando se completa el cupo diario.
+Si sales, *puedes perder el acceso*.
+`;
+
+const REGISTER_MESSAGE = `
+💰 *BONO ACTIVO PARA TI*
+
+🎰 Casino verificado
+🎁 Bono de bienvenida exclusivo
+⚡ Retiros rápidos
+
+👇 Accede ahora:
+`;
+
+const HUMAN_MESSAGE = `
+👤 *ATENCIÓN HUMANA*
+
+Un operador revisará tu caso.
+⏳ Tiempo estimado: 5–15 minutos
+
+⚠️ No cierres el chat.
+`;
+
+// ============================
+// BOTONES
+// ============================
+const mainMenu = Markup.inlineKeyboard([
+  [Markup.button.callback("🎰 QUIERO EL BONO", "GET_BONUS")],
+  [Markup.button.callback("💬 HABLAR CON SOPORTE", "HUMAN")],
+]);
+
+const bonusMenu = Markup.inlineKeyboard([
+  [Markup.button.url("🚀 ACCEDER AL CASINO", AFFILIATE_LINK)],
+  [Markup.button.callback("❓ NO PUDE REGISTRARME", "HUMAN")],
+]);
+
+// ============================
+// START
+// ============================
 bot.start(async (ctx) => {
   const user = ctx.from;
-  const source = ctx.startPayload || "directo";
 
-  await notifyAdmin(
-    `🆕 <b>NUEVO LEAD</b>\n` +
-    `👤 @${user.username || "sin_username"}\n` +
-    `🆔 ${user.id}\n` +
-    `📍 Origen: ${source}`
+  // Aviso al admin (lead nuevo)
+  await bot.telegram.sendMessage(
+    ADMIN_CHAT_ID,
+    `🆕 *Nuevo lead*\n👤 ${user.first_name}\n🆔 ${user.id}`,
+    { parse_mode: "Markdown" }
   );
 
-  await ctx.reply(
-    `🎰 <b>ACCESO VIP OCEAN CASINO</b>\n\n` +
-    `⚠️ No trabajo con curiosos\n` +
-    `💰 Solo jugadores reales\n` +
-    `🔥 Bonos activos HOY\n\n` +
-    `¿Desde qué país nos escribes?`,
-    {
-      parse_mode: "HTML",
-      ...Markup.inlineKeyboard([
-        [Markup.button.callback("🇨🇱 Chile (Prioridad)", "country_chile")],
-        [Markup.button.callback("🇲🇽 México", "country_mexico")],
-        [Markup.button.callback("🇵🇪 Perú", "country_peru")],
-        [Markup.button.callback("🇨🇴 Colombia", "country_colombia")],
-        [Markup.button.callback("🌎 Otro", "country_other")],
-      ]),
-    }
-  );
-});
-/* =========================================== */
-
-/* ================= COUNTRY ================= */
-bot.action(/country_(.+)/, async (ctx) => {
-  await ctx.answerCbQuery();
-  const country = ctx.match[1];
-  const user = ctx.from;
-
-  await notifyAdmin(
-    `📍 <b>PAÍS</b>\n` +
-    `👤 @${user.username || "sin_username"}\n` +
-    `🌎 ${country.toUpperCase()}`
-  );
-
-  await ctx.reply(
-    `✅ <b>ACCESO VALIDADO</b>\n\n` +
-    `🎁 Bonos reales\n` +
-    `⚡ Retiros rápidos\n` +
-    `👤 Atención directa\n\n` +
-    `Elige una opción:`,
-    {
-      parse_mode: "HTML",
-      ...Markup.inlineKeyboard([
-        [Markup.button.callback("🎁 QUIERO EL BONO", "bonus")],
-        [Markup.button.callback("💸 ¿CÓMO RETIRO?", "withdraw")],
-        [Markup.button.callback("🎮 JUEGOS", "games")],
-        [Markup.button.callback("👤 HABLAR CON HUMANO", "support")],
-      ]),
-    }
-  );
-});
-/* =========================================== */
-
-/* ================= ACTIONS ================= */
-bot.action("bonus", async (ctx) => {
-  await ctx.answerCbQuery();
-  await ctx.reply(
-    `🔥 <b>BONO VIP DISPONIBLE</b>\n\n` +
-    `Solo para jugadores activos.\n\n` +
-    `¿Cuánto planeas depositar?`,
-    {
-      parse_mode: "HTML",
-      ...Markup.inlineKeyboard([
-        [Markup.button.callback("$10 – $20", "dep_10_20")],
-        [Markup.button.callback("$20 – $50", "dep_20_50")],
-        [Markup.button.callback("$50 – $100", "dep_50_100")],
-        [Markup.button.callback("+$100", "dep_100_plus")],
-      ]),
-    }
-  );
+  await ctx.replyWithMarkdown(START_MESSAGE, mainMenu);
 });
 
-bot.action(/dep_.+/, async (ctx) => {
-  await ctx.answerCbQuery();
-  const user = ctx.from;
-  const amount = ctx.callbackQuery.data.replace("dep_", "").replace(/_/g, " ");
-
-  await notifyAdmin(
-    `🔥 <b>LEAD CALIFICADO</b>\n` +
-    `👤 @${user.username || "sin_username"}\n` +
-    `💰 Depósito: ${amount}`
-  );
-
-  await ctx.reply(
-    `✅ Perfecto.\n\n` +
-    `Un asesor VIP te escribe ahora.\n` +
-    `⚠️ Ten listo tu medio de pago.`,
-    { parse_mode: "HTML" }
-  );
-});
-
-bot.action("withdraw", async (ctx) => {
-  await ctx.answerCbQuery();
-  await ctx.reply(
-    `💸 <b>RETIROS RÁPIDOS</b>\n\n` +
-    `✔ Transferencia\n` +
-    `✔ Crypto\n` +
-    `✔ Sin vueltas`,
-    { parse_mode: "HTML" }
-  );
-});
-
-bot.action("games", async (ctx) => {
-  await ctx.answerCbQuery();
-  await ctx.reply(
-    `🎮 <b>JUEGOS TOP</b>\n\n` +
-    `Slots\n` +
-    `Live Casino\n` +
-    `Jackpots`,
-    { parse_mode: "HTML" }
-  );
-});
-
-bot.action("support", async (ctx) => {
-  await ctx.answerCbQuery();
-  const user = ctx.from;
-
-  await notifyAdmin(
-    `🧑‍💼 <b>ATENCIÓN HUMANA</b>\n` +
-    `👤 @${user.username || "sin_username"}`
-  );
-
-  await ctx.reply(
-    `👤 Un asesor VIP toma tu caso ahora.\n` +
-    `⏳ No cierres el chat.`,
-    { parse_mode: "HTML" }
-  );
-});
-/* =========================================== */
-
-/* ================= FALLBACK ================= */
+// ============================
+// BLOQUEAR TEXTO LIBRE
+// ============================
 bot.on("text", async (ctx) => {
-  await ctx.reply(
-    `⚠️ Usa los botones.\n` +
-    `El acceso es limitado.`,
-    { parse_mode: "HTML" }
+  await ctx.reply(BLOCKED_MESSAGE);
+});
+
+// ============================
+// ACCIONES
+// ============================
+bot.action("GET_BONUS", async (ctx) => {
+  await ctx.answerCbQuery();
+  await ctx.replyWithMarkdown(URGENCY_MESSAGE);
+  await ctx.replyWithMarkdown(REGISTER_MESSAGE, bonusMenu);
+});
+
+bot.action("HUMAN", async (ctx) => {
+  await ctx.answerCbQuery();
+
+  // Aviso al admin
+  await bot.telegram.sendMessage(
+    ADMIN_CHAT_ID,
+    `🧑‍💬 *Solicitud de atención humana*\n🆔 ${ctx.from.id}`,
+    { parse_mode: "Markdown" }
   );
-});
-/* =========================================== */
 
-/* ================= LAUNCH =================== */
-bot.launch().then(() => {
-  console.log("✅ Ocean Casino Bot ACTIVO");
+  await ctx.replyWithMarkdown(HUMAN_MESSAGE);
 });
 
-process.once("SIGINT", () => bot.stop("SIGINT"));
-process.once("SIGTERM", () => bot.stop("SIGTERM"));
-/* =========================================== */
+// ============================
+// START BOT
+// ============================
+bot.launch();
+console.log("🤖 OceanCasinoVIP Bot activo");
